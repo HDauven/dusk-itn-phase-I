@@ -1,0 +1,11 @@
+{
+  "name": "dusk-itn-phase-I",
+  "version": "1.0.0",
+  "description": "Repo containing a script to replicate the Dusk ITN phase I results.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Hein Dauven",
+  "license": "ISC"
+}
