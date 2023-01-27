@@ -3,6 +3,7 @@ const readline = require('readline');
 
 let provisionerMap = new Map();
 let blockTimesMap = new Map();
+let blockSeries = new Map();
 let transactionCounter = 0;
 let blockCounter = 0;
 
@@ -38,10 +39,11 @@ rl.on('line', (line) => {
         return;
     }
 
+    let blockHeight = jsonLine.height;
     let blockTime = jsonLine.block_time;
     let txsCount = jsonLine.txs_count;
     if (blockTime && jsonLine.msg.includes("complete")) {
-        blockCounter++;
+        blockSeries.set(blockHeight, blockTime);
         if (blockTimesMap.has(blockTime)) {
             blockTimesMap.get(blockTime).count++;
             blockTimesMap.get(blockTime).txsCount += txsCount;
@@ -68,7 +70,8 @@ rl.on('close', () => {
             provisionerMissed: [],
             totalTransactions: transactionCounter,
             totalBlocks: blockCounter,
-            block_times: {}
+            block_times: {},
+            blockSeries: {}
         }
     };
 
@@ -91,6 +94,27 @@ rl.on('close', () => {
             txsCount: value.txsCount,
             txsCountOccurrences: Object.fromEntries(value.txsCountOccurrences)
         };
+    }
+
+    let newBlockSeries = new Map();
+    let sum = 0;
+    let count = 0;
+    let keyCount = 1;
+
+    for (let [blockHeight, blockTime] of blockSeries.entries()) {
+        sum += blockTime;
+        count++;
+        if (count % 100 === 0) {
+            newBlockSeries.set(keyCount, sum / 100);
+            sum = 0;
+            count = 0;
+            keyCount++;
+        }
+    }
+
+    for (let [key, value] of newBlockSeries.entries()){
+        console.log(key, value)
+        data.results.blockSeries[key] = value;
     }
 
     fs.writeFile("provisioners.json", JSON.stringify(data), (err) => {
