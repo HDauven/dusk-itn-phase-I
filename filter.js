@@ -15,6 +15,6 @@ rl.on('line', (line) => {
 
     if (acceptedProvisioners.includes(provisionerKey)) {
         acceptedProvisioners = acceptedProvisioners.filter(key => key !== provisionerKey);
-        fs.appendFileSync('./eligibleAddresses.txt', ethereumAddress + '\n');
+        fs.appendFileSync('./eligibleAddresses', ethereumAddress + '\n');
     }
 });
